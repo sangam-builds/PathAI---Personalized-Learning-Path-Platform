@@ -1,4 +1,5 @@
 (() => {
+	// Cache form elements for registration flow.
 	const form = document.getElementById("registerForm")
 	const nameInput = document.getElementById("name")
 	const emailInput = document.getElementById("email")
@@ -8,14 +9,16 @@
 	const messageElement = document.getElementById("formMessage")
 	const togglePasswordButton = document.getElementById("togglePassword")
 
+	// Exit early if helpers are unavailable.
 	if (!form || !window.Api || !window.Auth) {
 		return
 	}
-
+	// Global helpers live on window to avoid per-page imports.
 	if (window.UI) {
 		window.UI.renderFlashFromStorage()
 	}
 
+	// Redirect authenticated users away from the signup screen.
 	const existingAuth = window.Auth.getAuthData()
 	if (existingAuth?.token) {
 		const redirectPath = existingAuth?.user?.onboardingCompleted ? "/dashboard" : "/onboarding"
@@ -32,6 +35,7 @@
 		messageElement.classList.toggle("success", isSuccess)
 	}
 
+	// Toggle password visibility for better UX.
 	function setupPasswordToggle(button, input) {
 		button.addEventListener("click", () => {
 			const isHidden = input.type === "password"
@@ -72,6 +76,7 @@
 
 	setupPasswordToggle(togglePasswordButton, passwordInput)
 
+	// Google signup flow.
 	if (googleAuthButton && window.GoogleAuth) {
 		googleAuthButton.addEventListener("click", async () => {
 			googleAuthButton.disabled = true
@@ -106,6 +111,7 @@
 	}
 
 	form.addEventListener("submit", async (event) => {
+		// Handle submission via API without a full page reload.
 		event.preventDefault()
 
 		if (!validateForm()) {

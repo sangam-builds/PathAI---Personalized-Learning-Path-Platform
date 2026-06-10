@@ -1,9 +1,11 @@
 (() => {
+	// Require auth before showing dashboard.
 	if (!window.Auth) {
 		window.location.href = "/login"
 		return
 	}
 
+	// Redirect to login if no token is present.
 	const authData = window.Auth.getAuthData()
 	if (!authData?.token) {
 		const nextPath = encodeURIComponent("/dashboard")
@@ -11,6 +13,7 @@
 		return
 	}
 
+	// Show any pending flash message.
 	if (window.UI) {
 		window.UI.renderFlashFromStorage()
 	}
@@ -59,6 +62,7 @@
 		})
 	}
 
+	// Normalize numeric values from API payloads.
 	const toInt = (value) => {
 		const parsed = Number(value)
 		return Number.isFinite(parsed) ? Math.round(parsed) : 0
@@ -84,6 +88,7 @@
 			.replace(/'/g, "&#39;")
 	}
 
+	// Render the learning activity line chart.
 	const renderActivity = (activity = []) => {
 		if (!window.Chart) {
 			return
@@ -192,6 +197,7 @@
 		})
 	}
 
+	// Render the transformation comparison chart.
 	const renderTransformation = (transformation = {}) => {
 		if (!window.Chart) {
 			return
@@ -313,6 +319,7 @@
 		}
 	}
 
+	// Render topic difficulty distribution chart.
 	const renderDifficulty = (difficulty = {}) => {
 		if (!window.Chart) {
 			return
@@ -402,6 +409,7 @@
 		})
 	}
 
+	// Render the learning paths grid.
 	const renderPaths = (paths = []) => {
 		const list = Array.isArray(paths) ? paths : []
 		setText("pathsTotal", list.length)
@@ -464,6 +472,7 @@
 		})
 	}
 
+	// Populate all dashboard widgets.
 	const renderDashboard = (payload = {}) => {
 		const safeName = payload.userName || fallbackName
 		if (heroUserName) {
@@ -523,6 +532,7 @@
 		renderPaths(payload.learningPaths || [])
 	}
 
+	// Provide a safe fallback when API fails.
 	const setFallbackState = () => {
 		renderDashboard({
 			userName: fallbackName,
@@ -560,6 +570,7 @@
 		})
 	}
 
+	// Fetch dashboard data from the API.
 	const loadDashboard = async () => {
 		try {
 			const response = await window.Api.apiRequest("/progress/dashboard", {

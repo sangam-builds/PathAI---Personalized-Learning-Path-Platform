@@ -1,4 +1,5 @@
 (() => {
+	// Local UI state for courses and reader pane.
 	const state = {
 		topics: [],
 		activeTopicId: null,
@@ -6,6 +7,7 @@
 		requestedTopicId: null,
 	}
 
+	// Cache DOM references.
 	const el = {
 		courseTitle: document.getElementById("courseTitle"),
 		courseSubtitle: document.getElementById("courseSubtitle"),
@@ -45,6 +47,7 @@
 			.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
 	}
 
+	// Render markdown-style tables into HTML.
 	const renderTable = (rows) => {
 		if (!rows.length) {
 			return ""
@@ -79,6 +82,7 @@
 		`
 	}
 
+	// Convert lightweight markdown to HTML for the reader.
 	const renderRichContent = (rawContent) => {
 		if (!rawContent) {
 			return "<p>No content available for this topic yet.</p>"
@@ -207,6 +211,7 @@
 		return finalHtml
 	}
 
+	// Compute label and styles for a topic item state.
 	const getTopicStateMeta = (topic) => {
 		if (topic.quizPassed) {
 			return { label: "Completed", className: "state-completed" }
@@ -219,6 +224,7 @@
 		return { label: "Locked", className: "state-locked" }
 	}
 
+	// Render the list of topics in the sidebar.
 	const renderTopicList = () => {
 		if (!state.topics.length) {
 			el.topicList.innerHTML = "<li class=\"reader-empty\">No topics available.</li>"
@@ -249,6 +255,7 @@
 			.join("")
 	}
 
+	// Render the active topic into the reader pane.
 	const renderReader = () => {
 		const topic = state.topics.find((item) => item.id === state.activeTopicId)
 
@@ -278,12 +285,14 @@
 		}
 	}
 
+	// Update active topic selection and refresh UI.
 	const setActiveTopic = (topicId) => {
 		state.activeTopicId = topicId
 		renderTopicList()
 		renderReader()
 	}
 
+	// Attach click handlers to topic items.
 	const bindTopicEvents = () => {
 		el.topicList.querySelectorAll(".topic-item").forEach((button) => {
 			button.addEventListener("click", () => {
@@ -298,6 +307,7 @@
 		})
 	}
 
+	// Populate the page with course and topic data.
 	const renderAll = (payload) => {
 		const userLevel = payload?.user?.assessmentLevel || "beginner"
 		const course = payload?.course || {}
@@ -324,6 +334,7 @@
 		bindTopicEvents()
 	}
 
+	// Fetch the recommended course plan for the user.
 	const fetchRecommendedPlan = async (token) => {
 		const query = new URLSearchParams()
 		if (state.requestedCourseId) {
@@ -344,6 +355,7 @@
 		return response?.data || null
 	}
 
+	// Load the course plan and bind UI actions.
 	const init = async () => {
 		if (window.UI) {
 			window.UI.renderFlashFromStorage()

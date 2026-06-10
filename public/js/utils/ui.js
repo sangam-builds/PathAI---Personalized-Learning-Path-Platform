@@ -1,6 +1,8 @@
 (() => {
+	// Session-backed flash message storage key.
 	const FLASH_STORAGE_KEY = "pathAI.flash"
 
+	// Ensure a toast container exists for transient messages.
 	const ensureToastRoot = () => {
 		let toastRoot = document.getElementById("appFlashRoot")
 		if (toastRoot) {
@@ -19,6 +21,7 @@
 		return toastRoot
 	}
 
+	// Persist a message for the next page load.
 	const setFlashMessage = (message, type = "info") => {
 		if (!message || typeof message !== "string") {
 			return
@@ -33,6 +36,7 @@
 		sessionStorage.setItem(FLASH_STORAGE_KEY, JSON.stringify(payload))
 	}
 
+	// Retrieve and clear any pending flash message.
 	const consumeFlashMessage = () => {
 		const raw = sessionStorage.getItem(FLASH_STORAGE_KEY)
 		if (!raw) {
@@ -52,6 +56,7 @@
 		}
 	}
 
+	// Render a toast immediately on the current page.
 	const showFlashMessage = (message, type = "info", duration = 2600) => {
 		if (!message || typeof message !== "string") {
 			return
@@ -108,6 +113,7 @@
 		}, duration)
 	}
 
+	// Display any pending flash message saved in session storage.
 	const renderFlashFromStorage = () => {
 		const flash = consumeFlashMessage()
 		if (!flash) {

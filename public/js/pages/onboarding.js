@@ -1,8 +1,10 @@
 (() => {
+	// Cache onboarding form elements.
 	const form = document.getElementById("onboardingForm")
 	const submitButton = document.getElementById("submitButton")
 	const messageElement = document.querySelector("#formMessage")
 
+	// Exit early if helpers are missing.
 	if (!form || !window.Api || !window.Auth) {
 		return
 	}
@@ -11,6 +13,7 @@
 		window.UI.renderFlashFromStorage()
 	}
 
+	// Ensure the user is authenticated before onboarding.
 	const authData = window.Auth.getAuthData()
 	if (!authData?.token) {
 		window.location.href = "/login?next=/onboarding"
@@ -22,7 +25,7 @@
 		return
 	}
 
-	// Collect form data
+	// Collect values for all onboarding fields.
 	function getFormData() {
 		return {
 			main_goal: form.querySelector('input[name="main_goal"]:checked')?.value || "",
@@ -34,7 +37,7 @@
 		}
 	}
 
-	// Validate all fields
+	// Validate all fields before submission.
 	function validateForm() {
 		const data = getFormData()
 
@@ -77,6 +80,7 @@
 		}
 	}
 
+	// Show the transition screen before redirecting.
 	function showTransitionScreen() {
 		const formContainer = form.closest("section")
 		if (formContainer) {
@@ -88,6 +92,7 @@
 		}
 	}
 
+	// Redirect to the level assessment after onboarding.
 	function redirectToAssessmentQuiz() {
 		if (window.UI) {
 			window.UI.setFlashMessage("Onboarding saved. Level assessment is ready.", "success")
@@ -95,7 +100,7 @@
 		window.location.href = "/assessment"
 	}
 
-	// Handle form submission
+	// Handle form submission.
 	submitButton.addEventListener("click", async (event) => {
 		event.preventDefault()
 

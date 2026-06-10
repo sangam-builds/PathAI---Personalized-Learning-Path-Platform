@@ -1,4 +1,5 @@
 (() => {
+	// Cache form elements for login interactions.
 	const form = document.getElementById("loginForm")
 	const emailInput = document.getElementById("email")
 	const passwordInput = document.getElementById("password")
@@ -9,10 +10,12 @@
 	const nextPath = new URLSearchParams(window.location.search).get("next")
 	const safeRedirectPath = nextPath && nextPath.startsWith("/") ? nextPath : "/dashboard"
 
+	// Ensure the redirect stays on this origin.
 	function resolvePostAuthPath() {
 		return safeRedirectPath
 	}
 
+	// Exit early if required helpers are missing.
 	if (!form || !window.Api || !window.Auth) {
 		return
 	}
@@ -21,6 +24,7 @@
 		window.UI.renderFlashFromStorage()
 	}
 
+	// Skip login if the user already has a token.
 	const existingAuth = window.Auth.getAuthData()
 	if (existingAuth?.token) {
 		window.location.href = resolvePostAuthPath()
@@ -32,6 +36,7 @@
 		messageElement.classList.toggle("success", isSuccess)
 	}
 
+	// Client-side validation for basic form fields.
 	function validateForm() {
 		const email = emailInput.value.trim()
 		const password = passwordInput.value
@@ -61,6 +66,7 @@
 		togglePasswordButton.setAttribute("title", isVisible ? "Hide password" : "Show password")
 	})
 
+	// Google sign-in flow.
 	if (googleAuthButton && window.GoogleAuth) {
 		googleAuthButton.addEventListener("click", async () => {
 			googleAuthButton.disabled = true
@@ -94,6 +100,7 @@
 		})
 	}
 
+	// Email/password login flow.
 	form.addEventListener("submit", async (event) => {
 		event.preventDefault()
 

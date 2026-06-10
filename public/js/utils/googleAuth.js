@@ -1,9 +1,11 @@
+// Cache load/auth promises to avoid duplicate network calls.
 let googleScriptPromise = null
 let googleClientIdPromise = null
 
 const GOOGLE_SCRIPT_SELECTOR = 'script[src^="https://accounts.google.com/gsi/client"]'
 const SCRIPT_READY_TIMEOUT_MS = 7000
 
+// Wait for the Google Identity Services library to be ready.
 const waitForGoogleOAuthApi = (timeoutMs = SCRIPT_READY_TIMEOUT_MS) =>
 	new Promise((resolve, reject) => {
 		const start = Date.now()
@@ -29,6 +31,7 @@ const waitForGoogleOAuthApi = (timeoutMs = SCRIPT_READY_TIMEOUT_MS) =>
 		checkReady()
 	})
 
+// Wire load/error handlers for the injected script tag.
 const attachScriptListeners = (script, resolve, reject) => {
 	const onLoad = () => {
 		waitForGoogleOAuthApi().then(resolve).catch(reject)
@@ -48,6 +51,7 @@ const attachScriptListeners = (script, resolve, reject) => {
 	return { onLoad, onError }
 }
 
+// Load the Google OAuth script once and reuse the promise.
 const loadGoogleScript = () => {
 	if (!googleScriptPromise) {
 		googleScriptPromise = new Promise((resolve, reject) => {
@@ -93,6 +97,7 @@ const loadGoogleScript = () => {
 	return googleScriptPromise
 }
 
+// Retry once by removing a stale script element if needed.
 const loadGoogleScriptWithRetry = async () => {
 	try {
 		await loadGoogleScript()
@@ -108,6 +113,7 @@ const loadGoogleScriptWithRetry = async () => {
 	}
 }
 
+// Fetch the client ID from the backend config endpoint.
 const getGoogleClientId = async () => {
 	if (!googleClientIdPromise) {
 		googleClientIdPromise = window.Api.apiRequest("/auth/google/config")
@@ -124,6 +130,7 @@ const getGoogleClientId = async () => {
 	return googleClientIdPromise
 }
 
+// Request an OAuth access token via Google Identity Services.
 const requestGoogleAccessToken = async (clientId) => {
 	await loadGoogleScriptWithRetry()
 
@@ -145,6 +152,7 @@ const requestGoogleAccessToken = async (clientId) => {
 	})
 }
 
+// Full flow: load script, request token, then exchange with backend.
 const authenticateWithGoogle = async () => {
 	if (!window.Api) {
 		throw new Error("API utility is not available")

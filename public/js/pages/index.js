@@ -1,4 +1,5 @@
 (() => {
+	// Cache DOM references for navigation and hero interactions.
 	const menuToggle = document.getElementById("menuToggle")
 	const navLinks = document.getElementById("siteNavLinks")
 	const quizOptionsWrap = document.getElementById("quizOptions")
@@ -12,6 +13,7 @@
 		"Python ML",
 	]
 
+	// Toggle mobile navigation visibility.
 	if (menuToggle && navLinks) {
 		menuToggle.addEventListener("click", () => {
 			const isOpen = navLinks.classList.toggle("open")
@@ -26,6 +28,7 @@
 		})
 	}
 
+	// Allow selecting a quiz option card.
 	if (quizOptionsWrap) {
 		quizOptionsWrap.querySelectorAll(".qp-opt").forEach((option) => {
 			option.addEventListener("click", () => {
@@ -37,6 +40,7 @@
 		})
 	}
 
+	// Rotate hero topic text to create motion.
 	if (heroTrackTopic) {
 		let topicIndex = 0
 		heroTrackTopic.textContent = topics[topicIndex]
@@ -52,6 +56,7 @@
 		}, 2500)
 	}
 
+	// Highlight the active section in the nav on scroll.
 	if (navSectionLinks.length) {
 		const sectionMap = {}
 		navSectionLinks.forEach((link) => {

@@ -1,5 +1,5 @@
 (() => {
-	// Quiz state
+	// Quiz runtime state stored in-memory for this page session.
 	let quizState = {
 		quizId: null,
 		topicId: null,
@@ -19,7 +19,7 @@
 		nextTopicTitle: '',
 	}
 
-	// Initialize
+	// Initialize quiz data and UI.
 	async function initQuiz() {
 		if (window.UI) {
 			window.UI.renderFlashFromStorage()
@@ -80,6 +80,7 @@
 		}
 	}
 
+	// UI state helpers for loading/quiz/results/error screens.
 	function showLoading() {
 		document.getElementById('loadingState').style.display = 'flex'
 		document.getElementById('quizInterface').style.display = 'none'
@@ -109,6 +110,7 @@
 		document.getElementById('errorMessage').textContent = message
 	}
 
+	// Build initial quiz UI shell.
 	function renderInterface() {
 		const totalQuestions = quizState.questions.length
 		document.getElementById('quizTitle').textContent = quizState.isAssessment ? 'Skill Assessment' : 'Topic Quiz'
@@ -119,6 +121,7 @@
 		showQuiz()
 	}
 
+	// Render the current question and its options.
 	function displayQuestion() {
 		const question = quizState.questions[quizState.currentQuestionIndex]
 		if (!question) {
@@ -186,6 +189,7 @@
 		updateNavigationButtons()
 	}
 
+	// Update selected answer and refresh the question UI.
 	function selectOption(index) {
 		if (quizState.submitted) {
 			return
@@ -202,6 +206,7 @@
 		showToast('Answer selected', 'success')
 	}
 
+	// Show explanation only after submission.
 	function updateExplanation() {
 		if (!quizState.submitted) {
 			document.getElementById('explanationBox').style.display = 'none'
@@ -227,6 +232,7 @@
 		document.getElementById('explanationText').textContent = question.explanation || 'No explanation available.'
 	}
 
+	// Update answered count indicator.
 	function updateAnswerIndicator() {
 		const totalQuestions = quizState.questions.length
 		let answeredCount = 0
@@ -240,6 +246,7 @@
 		document.getElementById('answerIndicator').textContent = `${answeredCount}/${totalQuestions} answered`
 	}
 
+	// Enable/disable navigation based on progress.
 	function updateNavigationButtons() {
 		const currentIndex = quizState.currentQuestionIndex
 		const totalQuestions = quizState.questions.length
@@ -259,6 +266,7 @@
 		}
 	}
 
+	// Expose navigation handlers for button onclick attributes.
 	window.previousQuestion = function () {
 		if (quizState.currentQuestionIndex > 0) {
 			quizState.currentQuestionIndex--
@@ -287,6 +295,7 @@
 		}
 	}
 
+	// Submit quiz results to the backend.
 	async function submitQuiz() {
 		const authData = window.Auth?.getAuthData()
 
@@ -351,6 +360,7 @@
 		}
 	}
 
+	// Fetch the next topic suggestion after a passed quiz.
 	async function loadNextTopicSuggestion() {
 		quizState.nextTopicId = null
 		quizState.nextTopicCourseId = null
@@ -394,6 +404,7 @@
 		return null
 	}
 
+	// Configure primary/secondary buttons on the results screen.
 	function configureResultActions({ isPassed, nextTopic }) {
 		const secondaryBtn = document.getElementById('resultSecondaryBtn')
 		const primaryBtn = document.getElementById('resultPrimaryBtn')
@@ -427,6 +438,7 @@
 		primaryBtn.onclick = () => window.reviewAnswers()
 	}
 
+	// Populate the results screen with score and next steps.
 	async function displayResults() {
 		const correctCount = Object.values(quizState.answers).filter((answer, idx) => {
 			return answer === quizState.questions[idx].correctAnswer
@@ -531,6 +543,7 @@
 		window.location.href = '/dashboard'
 	}
 
+	// Lightweight toast for transient quiz messages.
 	function showToast(message, type = 'info') {
 		const toast = document.getElementById('messageToast')
 		toast.textContent = message

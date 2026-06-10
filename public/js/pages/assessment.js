@@ -1,4 +1,5 @@
 (() => {
+	// Polling and countdown timings.
 	const POLL_INTERVAL_MS = 5000
 	const QUIZ_START_DELAY_SECONDS = 10
 	let pollHandle = null
@@ -6,6 +7,7 @@
 	let countdownTarget = null
 	let startButtonDefaultLabel = "Start Level Check"
 
+	// Cache DOM references used throughout the page.
 	const elements = {
 		livePill: document.getElementById("livePill"),
 		currentLevel: document.getElementById("currentLevel"),
@@ -24,6 +26,7 @@
 		cancelCountdownBtn: document.getElementById("cancelCountdownBtn"),
 	}
 
+	// Format helpers for UI text.
 	const capitalize = (value) => {
 		if (!value) {
 			return "Not available"
@@ -46,6 +49,7 @@
 		})
 	}
 
+	// Render the latest attempt summary card.
 	const renderLatestAttempt = (latest) => {
 		if (!latest) {
 			elements.latestAttemptBlock.innerHTML =
@@ -61,6 +65,7 @@
 		`
 	}
 
+	// Render past attempts list.
 	const renderHistory = (history) => {
 		if (!history || !history.length) {
 			elements.historyList.innerHTML = '<li class="history-empty">No attempts yet.</li>'
@@ -82,6 +87,7 @@
 			.join("")
 	}
 
+	// Populate the UI with fresh assessment data.
 	const renderData = (payload) => {
 		const latest = payload.latest
 		const stats = payload.stats || {}
@@ -105,6 +111,7 @@
 		renderHistory(payload.history || [])
 	}
 
+	// Update the live status pill styles and text.
 	const setLiveState = (message, isHealthy = true) => {
 		elements.livePill.textContent = message
 		elements.livePill.style.borderColor = isHealthy
@@ -126,6 +133,7 @@
 		return 'other'
 	}
 
+	// Fetch assessment status from the API.
 	const fetchAssessmentStatus = async (authToken) => {
 		const response = await window.Api.apiRequest("/progress/assessment-status", {
 			method: "GET",
@@ -137,6 +145,7 @@
 		return response?.data || null
 	}
 
+	// Format countdown timer as mm:ss.
 	const formatTimer = (totalSeconds) => {
 		const safeValue = Math.max(0, totalSeconds)
 		const minutes = Math.floor(safeValue / 60)
@@ -144,6 +153,7 @@
 		return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
 	}
 
+	// Reset countdown UI back to idle state.
 	const hideCountdown = () => {
 		elements.countdownOverlay.classList.remove("active")
 		elements.countdownOverlay.setAttribute("aria-hidden", "true")
@@ -161,6 +171,7 @@
 		countdownTarget = null
 	}
 
+	// Begin countdown and navigate to the assessment quiz.
 	const startCountdown = (authUser) => {
 		if (countdownHandle) {
 			return
@@ -198,6 +209,7 @@
 		countdownHandle = setInterval(tick, 200)
 	}
 
+	// Poll server for updates and refresh the UI.
 	const poll = async (authToken) => {
 		try {
 			const data = await fetchAssessmentStatus(authToken)
@@ -219,6 +231,7 @@
 		}
 	}
 
+	// Wire events and kick off polling.
 	const init = async () => {
 		if (window.UI) {
 			window.UI.renderFlashFromStorage()
